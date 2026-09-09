@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+:root {
+  /* Main website colors */
+  --background: #000000;
+  --foreground: #ffffff;
+
+  /* Brand colors */
+  --brand-orange: #ff6f00;
+  --brand-orange-dark: #e65100;
+
+  --brand-yellow: #ffd600;
+  --brand-green: #00ff7f;
+
+  /* Supporting colors */
+  --brand-gray: #bdbdbd;
+  --brand-dark: #0a0a0a;
+  --brand-card: #111111;
+  --brand-border: #242424;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-orange-dark: var(--brand-orange-dark);
+
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-green: var(--brand-green);
+
+  --color-brand-gray: var(--brand-gray);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-card: var(--brand-card);
+  --color-brand-border: var(--brand-border);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* --------------------------------
+   GLOBAL RESET
+--------------------------------- */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: #000000;
+}
+
+body {
+  margin: 0;
+  background: #000000;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* --------------------------------
+   TEXT SELECTION
+--------------------------------- */
+
+::selection {
+  background: #ff6f00;
+  color: #ffffff;
+}
+
+/* --------------------------------
+   LINKS & BUTTONS
+--------------------------------- */
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* --------------------------------
+   PASTEL / NEON BRAND UTILITIES
+--------------------------------- */
+
+.brand-gradient {
+  background: linear-gradient(
+    135deg,
+    #ff6f00 0%,
+    #ffd600 100%
+  );
+}
+
+.brand-gradient-green {
+  background: linear-gradient(
+    135deg,
+    #00ff7f 0%,
+    #00e5ff 100%
+  );
+}
+
+.orange-glow {
+  box-shadow:
+    0 0 20px rgba(255, 111, 0, 0.18),
+    0 0 45px rgba(255, 111, 0, 0.08);
+}
+
+.green-glow {
+  box-shadow:
+    0 0 20px rgba(0, 255, 127, 0.18),
+    0 0 45px rgba(0, 255, 127, 0.08);
+}
+
+.yellow-glow {
+  box-shadow:
+    0 0 20px rgba(255, 214, 0, 0.18),
+    0 0 45px rgba(255, 214, 0, 0.08);
+}
+
+/* --------------------------------
+   DARK FOOD CARDS
+--------------------------------- */
+
+.dark-card {
+  background: #111111;
+  border: 1px solid #242424;
+  border-radius: 1.5rem;
+}
+
+.dark-card:hover {
+  border-color: rgba(255, 111, 0, 0.5);
+  box-shadow: 0 0 25px rgba(255, 111, 0, 0.1);
+}
+
+/* --------------------------------
+   SCROLLBAR
+--------------------------------- */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff6f00;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffd600;
+}
