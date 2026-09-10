@@ -72,51 +72,42 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [filterStatus, setFilterStatus] =
-    useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
 
-  const [period, setPeriod] =
-    useState<Period>("today");
+  const [period, setPeriod] = useState<Period>("today");
 
   // --------------------------------------------------
   // GET START DATE
   // --------------------------------------------------
 
-  function getStartDate(
-    selectedPeriod: Period
-  ) {
+  function getStartDate(selectedPeriod: Period) {
     const now = new Date();
 
     const start = new Date(now);
 
     if (selectedPeriod === "today") {
-      // Today: 12:00 AM
       start.setHours(0, 0, 0, 0);
     }
 
     if (selectedPeriod === "weekly") {
-      // Monday 12:00 AM
       const day = start.getDay();
 
       const daysFromMonday =
         day === 0 ? 6 : day - 1;
 
       start.setDate(
-        start.getDate() -
-          daysFromMonday
+        start.getDate() - daysFromMonday
       );
 
       start.setHours(0, 0, 0, 0);
     }
 
     if (selectedPeriod === "monthly") {
-      // First day of current month
       start.setDate(1);
       start.setHours(0, 0, 0, 0);
     }
 
     if (selectedPeriod === "yearly") {
-      // January 1 of current year
       start.setMonth(0, 1);
       start.setHours(0, 0, 0, 0);
     }
@@ -166,15 +157,11 @@ export default function AdminOrdersPage() {
       } = await supabase.auth.getUser();
 
       if (userError) {
-        throw new Error(
-          userError.message
-        );
+        throw new Error(userError.message);
       }
 
       if (!user) {
-        throw new Error(
-          "You are not logged in."
-        );
+        throw new Error("You are not logged in.");
       }
 
       // --------------------------------------------
@@ -196,8 +183,7 @@ export default function AdminOrdersPage() {
         );
       }
 
-      const typedAdmin =
-        admin as Admin;
+      const typedAdmin = admin as Admin;
 
       // --------------------------------------------
       // GET BRANCH NAME
@@ -209,10 +195,7 @@ export default function AdminOrdersPage() {
       } = await supabase
         .from("branches")
         .select("name")
-        .eq(
-          "id",
-          typedAdmin.branch_id
-        )
+        .eq("id", typedAdmin.branch_id)
         .single();
 
       if (branchError || !branch) {
@@ -227,9 +210,7 @@ export default function AdminOrdersPage() {
       // GET DATE RANGE
       // --------------------------------------------
 
-      const startDate =
-        getStartDate(period);
-
+      const startDate = getStartDate(period);
       const endDate = new Date();
 
       // --------------------------------------------
@@ -271,9 +252,7 @@ export default function AdminOrdersPage() {
         });
 
       if (orderError) {
-        throw new Error(
-          orderError.message
-        );
+        throw new Error(orderError.message);
       }
 
       setOrders(
@@ -343,20 +322,6 @@ export default function AdminOrdersPage() {
           .eq("user_id", user.id)
           .maybeSingle();
 
-        console.log(
-          "REALTIME ADMIN:",
-          admin
-        );
-
-        console.log(
-          "REALTIME ADMIN ERROR:",
-          adminError
-        );
-
-        if (!mounted) {
-          return;
-        }
-
         if (adminError) {
           console.error(
             "REALTIME ADMIN QUERY ERROR:",
@@ -374,12 +339,17 @@ export default function AdminOrdersPage() {
           return;
         }
 
+        if (!mounted) {
+          return;
+        }
+
         // --------------------------------------------
         // 3. GET BRANCH ID
         // --------------------------------------------
 
-        const branchId =
-          Number(admin.branch_id);
+        const branchId = Number(
+          admin.branch_id
+        );
 
         if (!branchId) {
           console.error(
@@ -428,8 +398,18 @@ export default function AdminOrdersPage() {
           (payload) => {
             console.log(
               "REALTIME ORDER UPDATE:",
+              payload.eventType,
               payload
             );
+
+            if (!mounted) {
+              return;
+            }
+
+            // Reload orders after:
+            // INSERT
+            // UPDATE
+            // DELETE
 
             loadOrders();
           }
@@ -439,14 +419,36 @@ export default function AdminOrdersPage() {
         // 7. SUBSCRIBE
         // --------------------------------------------
 
-        channel.subscribe(
-          (status) => {
+        channel.subscribe((status) => {
+          console.log(
+            "ORDERS REALTIME STATUS:",
+            status
+          );
+
+          if (status === "SUBSCRIBED") {
             console.log(
-              "ORDERS REALTIME STATUS:",
-              status
+              "✅ ORDERS REALTIME CONNECTED"
             );
           }
-        );
+
+          if (status === "CHANNEL_ERROR") {
+            console.error(
+              "❌ ORDERS REALTIME CHANNEL ERROR"
+            );
+          }
+
+          if (status === "TIMED_OUT") {
+            console.error(
+              "❌ ORDERS REALTIME TIMED OUT"
+            );
+          }
+
+          if (status === "CLOSED") {
+            console.log(
+              "ℹ️ ORDERS REALTIME CHANNEL CLOSED"
+            );
+          }
+        });
       } catch (error) {
         console.error(
           "REALTIME SETUP ERROR:",
@@ -465,9 +467,11 @@ export default function AdminOrdersPage() {
       mounted = false;
 
       if (channel) {
-        supabase.removeChannel(
-          channel
+        console.log(
+          "Removing orders realtime channel..."
         );
+
+        supabase.removeChannel(channel);
 
         channel = null;
       }
@@ -486,9 +490,7 @@ export default function AdminOrdersPage() {
   // STATUS STYLE
   // --------------------------------------------------
 
-  function statusStyle(
-    status: string
-  ) {
+  function statusStyle(status: string) {
     switch (status) {
       case "pending":
         return {
@@ -547,8 +549,7 @@ export default function AdminOrdersPage() {
       ? orders
       : orders.filter(
           (order) =>
-            order.status ===
-            filterStatus
+            order.status === filterStatus
         );
 
   // --------------------------------------------------
@@ -659,9 +660,7 @@ export default function AdminOrdersPage() {
           </div>
         )}
 
-        {/* ==========================================
-            PERIOD FILTER
-        ========================================== */}
+        {/* PERIOD FILTER */}
 
         <div className="mt-7 rounded-2xl border border-[#242424] bg-[#111] p-4">
 
@@ -682,42 +681,33 @@ export default function AdminOrdersPage() {
 
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
 
-            {periods.map(
-              (item) => {
+            {periods.map((item) => {
 
-                const active =
-                  period ===
-                  item.value;
+              const active =
+                period === item.value;
 
-                return (
-                  <button
-                    key={
-                      item.value
-                    }
-                    onClick={() =>
-                      setPeriod(
-                        item.value
-                      )
-                    }
-                    className={`rounded-xl px-4 py-3 text-sm font-extrabold transition ${
-                      active
-                        ? "bg-gradient-to-r from-[#FF6F00] to-[#FFD600] text-black shadow-[0_0_20px_rgba(255,111,0,0.15)]"
-                        : "border border-[#2a2a2a] bg-[#080808] text-[#888] hover:border-[#FF6F00] hover:text-white"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                );
-              }
-            )}
+              return (
+                <button
+                  key={item.value}
+                  onClick={() =>
+                    setPeriod(item.value)
+                  }
+                  className={`rounded-xl px-4 py-3 text-sm font-extrabold transition ${
+                    active
+                      ? "bg-gradient-to-r from-[#FF6F00] to-[#FFD600] text-black shadow-[0_0_20px_rgba(255,111,0,0.15)]"
+                      : "border border-[#2a2a2a] bg-[#080808] text-[#888] hover:border-[#FF6F00] hover:text-white"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
 
           </div>
 
         </div>
 
-        {/* ==========================================
-            SUMMARY
-        ========================================== */}
+        {/* SUMMARY */}
 
         <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
 
@@ -860,51 +850,41 @@ export default function AdminOrdersPage() {
 
         </div>
 
-        {/* ==========================================
-            STATUS FILTERS
-        ========================================== */}
+        {/* STATUS FILTERS */}
 
         <div className="mt-7 overflow-x-auto rounded-2xl border border-[#242424] bg-[#111] p-4">
 
           <div className="flex min-w-max gap-2">
 
-            {statuses.map(
-              (status) => {
+            {statuses.map((status) => {
 
-                const active =
-                  filterStatus ===
-                  status;
+              const active =
+                filterStatus === status;
 
-                return (
-                  <button
-                    key={status}
-                    onClick={() =>
-                      setFilterStatus(
-                        status
-                      )
-                    }
-                    className={`rounded-full px-5 py-2.5 text-sm font-bold capitalize transition ${
-                      active
-                        ? "bg-gradient-to-r from-[#FF6F00] to-[#FFD600] text-black"
-                        : "border border-[#2a2a2a] bg-[#080808] text-[#888] hover:border-[#FF6F00] hover:text-white"
-                    }`}
-                  >
-                    {status ===
-                    "all"
-                      ? "All Orders"
-                      : status}
-                  </button>
-                );
-              }
-            )}
+              return (
+                <button
+                  key={status}
+                  onClick={() =>
+                    setFilterStatus(status)
+                  }
+                  className={`rounded-full px-5 py-2.5 text-sm font-bold capitalize transition ${
+                    active
+                      ? "bg-gradient-to-r from-[#FF6F00] to-[#FFD600] text-black"
+                      : "border border-[#2a2a2a] bg-[#080808] text-[#888] hover:border-[#FF6F00] hover:text-white"
+                  }`}
+                >
+                  {status === "all"
+                    ? "All Orders"
+                    : status}
+                </button>
+              );
+            })}
 
           </div>
 
         </div>
 
-        {/* ==========================================
-            TITLE
-        ========================================== */}
+        {/* TITLE */}
 
         <div className="mb-4 mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
@@ -916,8 +896,7 @@ export default function AdminOrdersPage() {
 
             <h2 className="mt-1 text-2xl font-extrabold">
 
-              {filterStatus ===
-              "all"
+              {filterStatus === "all"
                 ? `All Orders — ${getPeriodLabel()}`
                 : `${filterStatus
                     .charAt(0)
@@ -933,8 +912,7 @@ export default function AdminOrdersPage() {
 
             {filteredOrders.length}{" "}
 
-            {filteredOrders.length ===
-            1
+            {filteredOrders.length === 1
               ? "order"
               : "orders"}
 
@@ -942,9 +920,7 @@ export default function AdminOrdersPage() {
 
         </div>
 
-        {/* ==========================================
-            ORDERS
-        ========================================== */}
+        {/* ORDERS */}
 
         {loading ? (
 
@@ -961,8 +937,7 @@ export default function AdminOrdersPage() {
 
           </div>
 
-        ) : filteredOrders.length ===
-          0 ? (
+        ) : filteredOrders.length === 0 ? (
 
           <div className="rounded-3xl border border-[#242424] bg-[#111] p-14 text-center">
 
@@ -977,13 +952,15 @@ export default function AdminOrdersPage() {
             </h3>
 
             <p className="mt-2 text-sm text-[#666]">
-              There are no orders
-              for{" "}
+
+              There are no orders for{" "}
+
               <span className="font-bold text-[#FF6F00]">
                 {getPeriodLabel().toLowerCase()}
               </span>{" "}
-              matching this
-              filter.
+
+              matching this filter.
+
             </p>
 
           </div>
@@ -992,178 +969,157 @@ export default function AdminOrdersPage() {
 
           <div className="space-y-4">
 
-            {filteredOrders.map(
-              (order) => {
+            {filteredOrders.map((order) => {
 
-                const style =
-                  statusStyle(
-                    order.status
-                  );
+              const style =
+                statusStyle(order.status);
 
-                return (
-                  <div
-                    key={
-                      order.id
-                    }
-                    className="group rounded-3xl border border-[#242424] bg-[#111] p-5 transition hover:border-[#FF6F00]/50 sm:p-6"
-                  >
+              return (
+                <div
+                  key={order.id}
+                  className="group rounded-3xl border border-[#242424] bg-[#111] p-5 transition hover:border-[#FF6F00]/50 sm:p-6"
+                >
 
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
-                      {/* ORDER INFO */}
+                    {/* ORDER INFO */}
 
-                      <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1">
 
-                        <div className="flex flex-wrap items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
 
-                          <h3 className="text-xl font-extrabold">
-                            Order #
-                            {
-                              order.id
-                            }
-                          </h3>
+                        <h3 className="text-xl font-extrabold">
+                          Order #{order.id}
+                        </h3>
 
-                          <span
-                            className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold capitalize ${style.badge}`}
-                          >
+                        <span
+                          className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold capitalize ${style.badge}`}
+                        >
 
-                            {style.icon}
+                          {style.icon}
 
-                            {
-                              order.status
-                            }
+                          {order.status}
 
-                          </span>
+                        </span>
 
-                        </div>
+                      </div>
 
-                        <p className="mt-4 text-lg font-bold">
-                          {
-                            order.customer_name
-                          }
-                        </p>
+                      <p className="mt-4 text-lg font-bold">
+                        {order.customer_name}
+                      </p>
 
-                        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#777]">
+                      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#777]">
 
-                          {/* PHONE */}
+                        {/* PHONE */}
 
-                          {order.phone && (
-                            <span className="flex items-center gap-1.5">
+                        {order.phone && (
+                          <span className="flex items-center gap-1.5">
 
-                              <Phone
-                                size={14}
-                                className="text-[#FF6F00]"
-                              />
-
-                              {
-                                order.phone
-                              }
-
-                            </span>
-                          )}
-
-                          {/* ORDER TYPE */}
-
-                          <span className="flex items-center gap-1.5 capitalize">
-
-                            <Utensils
+                            <Phone
                               size={14}
-                              className="text-[#FFD600]"
+                              className="text-[#FF6F00]"
                             />
 
-                            {order.order_type.replace(
-                              "_",
-                              " "
-                            )}
+                            {order.phone}
 
                           </span>
+                        )}
 
-                          {/* TABLE */}
+                        {/* ORDER TYPE */}
 
-                          {order.table_id !==
-                            null && (
-                            <span className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-1.5 capitalize">
 
-                              <MapPin
-                                size={14}
-                                className="text-[#00FF7F]"
-                              />
+                          <Utensils
+                            size={14}
+                            className="text-[#FFD600]"
+                          />
 
-                              Table{" "}
-                              {
-                                order.table_id
-                              }
-
-                            </span>
+                          {order.order_type.replace(
+                            "_",
+                            " "
                           )}
 
-                        </div>
+                        </span>
 
-                        {/* DATE */}
+                        {/* TABLE */}
 
-                        <p className="mt-3 text-xs text-[#555]">
+                        {order.table_id !== null && (
+                          <span className="flex items-center gap-1.5">
 
-                          {new Date(
-                            order.created_at
-                          ).toLocaleString(
-                            "en-NP",
-                            {
-                              dateStyle:
-                                "medium",
-                              timeStyle:
-                                "medium",
-                            }
-                          )}
+                            <MapPin
+                              size={14}
+                              className="text-[#00FF7F]"
+                            />
+
+                            Table {order.table_id}
+
+                          </span>
+                        )}
+
+                      </div>
+
+                      {/* DATE */}
+
+                      <p className="mt-3 text-xs text-[#555]">
+
+                        {new Date(
+                          order.created_at
+                        ).toLocaleString(
+                          "en-NP",
+                          {
+                            dateStyle:
+                              "medium",
+                            timeStyle:
+                              "medium",
+                          }
+                        )}
+
+                      </p>
+
+                    </div>
+
+                    {/* TOTAL + DETAILS */}
+
+                    <div className="flex flex-col gap-4 border-t border-[#242424] pt-5 sm:flex-row sm:items-center lg:border-t-0 lg:pt-0">
+
+                      <div className="sm:text-right">
+
+                        <p className="text-xs font-semibold uppercase tracking-wider text-[#555]">
+                          Total
+                        </p>
+
+                        <p className="mt-1 text-2xl font-extrabold text-[#FFD600]">
+
+                          Rs.{" "}
+
+                          {Number(
+                            order.total_amount
+                          ).toLocaleString()}
 
                         </p>
 
                       </div>
 
-                      {/* TOTAL + DETAILS */}
-
-                      <div className="flex flex-col gap-4 border-t border-[#242424] pt-5 sm:flex-row sm:items-center lg:border-t-0 lg:pt-0">
-
-                        <div className="sm:text-right">
-
-                          <p className="text-xs font-semibold uppercase tracking-wider text-[#555]">
-                            Total
-                          </p>
-
-                          <p className="mt-1 text-2xl font-extrabold text-[#FFD600]">
-
-                            Rs.{" "}
-
-                            {Number(
-                              order.total_amount
-                            ).toLocaleString()}
-
-                          </p>
-
-                        </div>
-
-                        <Link
-                          href={`/admin/orders/${order.id}`}
-                          className="rounded-xl bg-[#1a1a1a] px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-gradient-to-r hover:from-[#FF6F00] hover:to-[#FFD600] hover:text-black"
-                        >
-                          View Details →
-                        </Link>
-
-                      </div>
+                      <Link
+                        href={`/admin/orders/${order.id}`}
+                        className="rounded-xl bg-[#1a1a1a] px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-gradient-to-r hover:from-[#FF6F00] hover:to-[#FFD600] hover:text-black"
+                      >
+                        View Details →
+                      </Link>
 
                     </div>
 
                   </div>
-                );
-              }
-            )}
+
+                </div>
+              );
+            })}
 
           </div>
 
         )}
 
-        {/* ==========================================
-            CANCELLED COUNT
-        ========================================== */}
+        {/* CANCELLED COUNT */}
 
         {cancelledCount > 0 && (
 
@@ -1171,8 +1127,7 @@ export default function AdminOrdersPage() {
 
             <XCircle size={14} />
 
-            {cancelledCount}{" "}
-            cancelled{" "}
+            {cancelledCount} cancelled{" "}
 
             {cancelledCount === 1
               ? "order"

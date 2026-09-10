@@ -48,9 +48,6 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
 
-  /*
-   * Load customer order IDs from localStorage
-   */
   const loadOrders = async () => {
     if (typeof window === "undefined") return;
 
@@ -66,9 +63,7 @@ export default function Navbar() {
 
       const orderIds = storedOrders
         .map(Number)
-        .filter(
-          (id) => Number.isInteger(id) && id > 0
-        );
+        .filter((id) => Number.isInteger(id) && id > 0);
 
       if (orderIds.length === 0) {
         setOrders([]);
@@ -84,26 +79,16 @@ export default function Navbar() {
         });
 
       if (error) {
-        console.error(
-          "NAVBAR ORDER ERROR:",
-          error
-        );
+        console.error("NAVBAR ORDER ERROR:", error);
         return;
       }
 
       setOrders(data ?? []);
     } catch (error) {
-      console.error(
-        "LOAD CUSTOMER ORDERS ERROR:",
-        error
-      );
+      console.error("LOAD CUSTOMER ORDERS ERROR:", error);
     }
   };
 
-  /*
-   * Load orders when navbar starts
-   * and keep status updated
-   */
   useEffect(() => {
     loadOrders();
 
@@ -114,43 +99,35 @@ export default function Navbar() {
     return () => clearInterval(interval);
   }, []);
 
-  /*
-   * Format status for display
-   */
   function formatStatus(status: string) {
     return status
       .replace("_", " ")
-      .replace(/\b\w/g, (letter) =>
-        letter.toUpperCase()
-      );
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
   }
 
   return (
     <>
       {/* NAVBAR */}
-
       <nav className="relative z-50 w-full border-b border-[#1f1f1f] bg-black">
+        <div className="mx-auto flex h-22 max-w-7xl items-center px-4 sm:h-22 sm:px-6">
 
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-center px-4 sm:h-24 sm:px-6">
-
-          {/* BRAND */}
-
+          {/* LOGO - LEFT SIDE */}
           <Link
             href="/"
-            className="text-lg font-bold italic tracking-tight text-white transition hover:text-[#FF6F00] sm:text-2xl md:text-3xl"
-            style={{
-              fontFamily: "cursive",
-            }}
+            className="flex items-center transition-opacity hover:opacity-90"
+            aria-label="Anil's Juice Station Home"
           >
-            Anil&apos;s Juice Station
+            <img
+             src="/logo/logo.png"
+             alt="Anil's Juice Station"
+             className="h-16 w-auto object-contain sm:h-20 md:h-24"
+            />
           </Link>
 
           {/* RIGHT SIDE */}
-
           <div className="absolute right-4 flex items-center gap-2 sm:right-6 sm:gap-4">
 
             {/* ORDER NOW */}
-
             <Link
               href="/checkout"
               className="rounded-full bg-gradient-to-r from-[#FF6F00] to-[#FFD600] px-4 py-2 text-xs font-bold text-black shadow-[0_0_18px_rgba(255,111,0,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_28px_rgba(255,111,0,0.4)] sm:px-6 sm:py-2.5 sm:text-sm"
@@ -159,7 +136,6 @@ export default function Navbar() {
             </Link>
 
             {/* HAMBURGER */}
-
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
@@ -172,13 +148,10 @@ export default function Navbar() {
             </button>
 
           </div>
-
         </div>
-
       </nav>
 
       {/* BACKDROP */}
-
       {menuOpen && (
         <div
           onClick={() => setMenuOpen(false)}
@@ -187,17 +160,13 @@ export default function Navbar() {
       )}
 
       {/* SIDE MENU */}
-
       <div
         className={`fixed right-0 top-0 z-[999] h-full w-[300px] border-l border-[#252525] bg-[#090909] shadow-2xl transition-transform duration-500 ease-in-out sm:w-[340px] ${
-          menuOpen
-            ? "translate-x-0"
-            : "translate-x-full"
+          menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
 
         {/* MENU HEADER */}
-
         <div className="flex h-20 items-center justify-between border-b border-[#252525] px-6 sm:h-24 sm:px-7">
 
           <span
@@ -221,11 +190,9 @@ export default function Navbar() {
         </div>
 
         {/* MENU CONTENT */}
-
         <div className="flex h-[calc(100%-5rem)] flex-col overflow-y-auto px-6 py-7 sm:h-[calc(100%-6rem)]">
 
           {/* MENU LINKS */}
-
           <div className="flex flex-col">
 
             <Link
@@ -263,7 +230,6 @@ export default function Navbar() {
           </div>
 
           {/* MY ORDERS */}
-
           {orders.length > 0 && (
             <div className="mt-7">
 
@@ -284,8 +250,7 @@ export default function Navbar() {
                 {orders.map((order) => {
 
                   const currentStatus =
-                    order.status?.toLowerCase() ||
-                    "pending";
+                    order.status?.toLowerCase() || "pending";
 
                   const style =
                     statusStyles[currentStatus] ??
@@ -295,22 +260,18 @@ export default function Navbar() {
                     <Link
                       key={order.id}
                       href={`/order/${order.id}`}
-                      onClick={() =>
-                        setMenuOpen(false)
-                      }
+                      onClick={() => setMenuOpen(false)}
                       className={`block rounded-xl border border-[#252525] p-3 transition hover:border-[#FF6F00] ${style.bg}`}
                     >
 
                       <div className="flex items-center justify-between gap-3">
 
                         {/* ORDER NUMBER */}
-
                         <div className="flex items-center gap-2">
 
                           <span
                             className={`h-2.5 w-2.5 rounded-full ${style.dot} ${
-                              currentStatus ===
-                              "preparing"
+                              currentStatus === "preparing"
                                 ? "animate-pulse"
                                 : ""
                             }`}
@@ -323,13 +284,10 @@ export default function Navbar() {
                         </div>
 
                         {/* STATUS */}
-
                         <span
                           className={`text-xs font-bold ${style.text}`}
                         >
-                          {formatStatus(
-                            currentStatus
-                          )}
+                          {formatStatus(currentStatus)}
                         </span>
 
                       </div>
@@ -343,12 +301,10 @@ export default function Navbar() {
                 })}
 
               </div>
-
             </div>
           )}
 
           {/* NO ORDERS */}
-
           {orders.length === 0 && (
             <div className="mt-7 rounded-2xl border border-dashed border-[#292929] bg-[#0d0d0d] p-5 text-center">
 
@@ -368,7 +324,6 @@ export default function Navbar() {
           )}
 
           {/* ORDER BUTTON */}
-
           <Link
             href="/checkout"
             onClick={() => setMenuOpen(false)}
@@ -378,7 +333,6 @@ export default function Navbar() {
           </Link>
 
           {/* DECORATIVE ACCENT */}
-
           <div className="mt-auto pt-10">
 
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#00FF7F]">
@@ -392,7 +346,6 @@ export default function Navbar() {
           </div>
 
         </div>
-
       </div>
     </>
   );
