@@ -13,9 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleLogin(
-    e: FormEvent<HTMLFormElement>
-  ) {
+  async function handleLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setError("");
@@ -95,15 +93,11 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-orange-50 px-6 py-16">
-
       <div className="mx-auto flex min-h-[80vh] max-w-md items-center">
-
         <div className="w-full rounded-3xl bg-white p-8 shadow-lg">
 
           {/* HEADER */}
-
           <div className="text-center">
-
             <div className="text-6xl">
               🍹
             </div>
@@ -119,20 +113,16 @@ export default function LoginPage() {
             <p className="mt-3 text-sm text-gray-500">
               Login to manage your branch.
             </p>
-
           </div>
 
           {/* FORM */}
-
           <form
             onSubmit={handleLogin}
             className="mt-8 space-y-5"
           >
 
             {/* EMAIL */}
-
             <div>
-
               <label className="mb-2 block text-sm font-bold text-gray-700">
                 Email Address
               </label>
@@ -145,15 +135,12 @@ export default function LoginPage() {
                 }
                 placeholder="admin@example.com"
                 autoComplete="email"
-                className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
               />
-
             </div>
 
             {/* PASSWORD */}
-
             <div>
-
               <label className="mb-2 block text-sm font-bold text-gray-700">
                 Password
               </label>
@@ -166,13 +153,11 @@ export default function LoginPage() {
                 }
                 placeholder="Enter your password"
                 autoComplete="current-password"
-                className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
               />
-
             </div>
 
             {/* ERROR */}
-
             {error && (
               <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-600">
                 {error}
@@ -180,7 +165,6 @@ export default function LoginPage() {
             )}
 
             {/* LOGIN BUTTON */}
-
             <button
               type="submit"
               disabled={loading}
@@ -192,11 +176,8 @@ export default function LoginPage() {
             </button>
 
           </form>
-
         </div>
-
       </div>
-
     </main>
   );
 }

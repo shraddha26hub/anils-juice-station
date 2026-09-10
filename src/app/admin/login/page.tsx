@@ -13,9 +13,7 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleLogin(
-    e: FormEvent<HTMLFormElement>
-  ) {
+  async function handleLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setError("");
@@ -34,24 +32,15 @@ export default function AdminLoginPage() {
         password,
       });
 
-      console.log(
-        "LOGIN USER:",
-        data.user
-      );
-
-      console.log(
-        "LOGIN ERROR:",
-        loginError
-      );
+      console.log("LOGIN USER:", data.user);
+      console.log("LOGIN ERROR:", loginError);
 
       if (loginError) {
         throw loginError;
       }
 
       if (!data.user) {
-        throw new Error(
-          "Login failed."
-        );
+        throw new Error("Login failed.");
       }
 
       /*
@@ -63,20 +52,11 @@ export default function AdminLoginPage() {
         error: sessionError,
       } = await supabase.auth.getSession();
 
-      console.log(
-        "LOGIN SESSION:",
-        sessionData.session
-      );
-
-      console.log(
-        "SESSION ERROR:",
-        sessionError
-      );
+      console.log("LOGIN SESSION:", sessionData.session);
+      console.log("SESSION ERROR:", sessionError);
 
       if (sessionError) {
-        throw new Error(
-          sessionError.message
-        );
+        throw new Error(sessionError.message);
       }
 
       if (!sessionData.session) {
@@ -94,24 +74,12 @@ export default function AdminLoginPage() {
         error: adminError,
       } = await supabase
         .from("admin_users")
-        .select(
-          "id, user_id, branch_id, role"
-        )
-        .eq(
-          "user_id",
-          data.user.id
-        )
+        .select("id, user_id, branch_id, role")
+        .eq("user_id", data.user.id)
         .maybeSingle();
 
-      console.log(
-        "ADMIN DATA:",
-        admin
-      );
-
-      console.log(
-        "ADMIN ERROR:",
-        adminError
-      );
+      console.log("ADMIN DATA:", admin);
+      console.log("ADMIN ERROR:", adminError);
 
       if (adminError) {
         throw new Error(
@@ -120,23 +88,15 @@ export default function AdminLoginPage() {
       }
 
       if (!admin) {
-        throw new Error(
-          "You are not registered as an admin."
-        );
+        throw new Error("You are not registered as an admin.");
       }
 
       /*
        * 4. Admin verified
        */
 
-      console.log(
-        "ADMIN LOGIN SUCCESS"
-      );
-
-      console.log(
-        "ADMIN BRANCH:",
-        admin.branch_id
-      );
+      console.log("ADMIN LOGIN SUCCESS");
+      console.log("ADMIN BRANCH:", admin.branch_id);
 
       /*
        * Give Supabase a moment to finish
@@ -144,23 +104,11 @@ export default function AdminLoginPage() {
        * navigating to the admin dashboard.
        */
 
-      await new Promise(
-        (resolve) =>
-          setTimeout(resolve, 300)
-      );
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       router.replace("/admin");
-
     } catch (error) {
-      console.error(
-        "LOGIN ERROR:",
-        error
-      );
-
-      /*
-       * Only sign out when the login itself
-       * should not remain active.
-       */
+      console.error("LOGIN ERROR:", error);
 
       await supabase.auth.signOut();
 
@@ -176,13 +124,11 @@ export default function AdminLoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-orange-50 px-6">
-
       <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg">
 
         {/* LOGO */}
 
         <div className="text-center">
-
           <div className="text-5xl">
             🔐
           </div>
@@ -198,7 +144,6 @@ export default function AdminLoginPage() {
           <p className="mt-2 text-sm text-gray-500">
             Login to manage your branch.
           </p>
-
         </div>
 
         {/* FORM */}
@@ -211,7 +156,6 @@ export default function AdminLoginPage() {
           {/* EMAIL */}
 
           <div>
-
             <label className="text-sm font-bold text-gray-800">
               Email
             </label>
@@ -219,22 +163,16 @@ export default function AdminLoginPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) =>
-                setEmail(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@example.com"
               required
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-orange-500"
+              className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
             />
-
           </div>
 
           {/* PASSWORD */}
 
           <div>
-
             <label className="text-sm font-bold text-gray-800">
               Password
             </label>
@@ -242,16 +180,11 @@ export default function AdminLoginPage() {
             <input
               type="password"
               value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-orange-500"
+              className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
             />
-
           </div>
 
           {/* ERROR */}
@@ -275,9 +208,7 @@ export default function AdminLoginPage() {
           </button>
 
         </form>
-
       </div>
-
     </main>
   );
 }
